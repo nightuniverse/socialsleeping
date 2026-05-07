@@ -79,15 +79,55 @@ export interface InjurySymptoms {
   triggers: string[]
   severity: number
   notes: string
+  sports: SportType[]
+}
+
+// Treatment path: self_treat → stretches/massage guide
+//                 see_doctor → hospital finder + referral info
+export type TreatmentPath = 'self_treat' | 'see_doctor'
+export type ReferralType = 'sports_medicine' | 'orthopedic' | 'emergency_room'
+export type ReferralUrgency = 'go_now' | 'within_24h' | 'this_week' | 'when_convenient'
+
+export interface TreatmentPhase {
+  name: string
+  duration: string
+  steps: string[]
+}
+
+export interface Stretch {
+  name: string
+  sets: string
+  technique: string
+}
+
+export interface MassageTechnique {
+  name: string
+  duration: string
+  technique: string
 }
 
 export interface InjuryAssessmentResult {
   likelyInjury: string
   confidence: 'low' | 'medium' | 'high'
   severity: 'minor' | 'moderate' | 'severe'
+  treatmentPath: TreatmentPath
   explanation: string
-  immediateSteps: string[]
-  recoveryTips: string[]
-  seeDoctor: string
+  sportNote: string | null
+
+  // Self-treat fields
+  phases?: TreatmentPhase[]
+  stretches?: Stretch[]
+  massageTechniques?: MassageTechnique[]
+  trainingModifications?: string[]
+  returnToSport?: string[]
+  prevention?: string[]
+
+  // Doctor fields
+  referralType?: ReferralType
+  referralUrgency?: ReferralUrgency
+  referralSearchQuery?: string
+  immediateSteps?: string[]
+  whatToTellDoctor?: string[]
+
   disclaimer: string
 }
