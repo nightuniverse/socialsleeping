@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import GoogleButton from '@/components/GoogleButton'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -35,6 +36,18 @@ export default function LoginPage() {
         </Link>
         <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-8">
           <h1 className="text-xl font-semibold mb-6">Welcome back</h1>
+
+          {/* Google OAuth — primary CTA */}
+          <GoogleButton label="Continue with Google" />
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-[#1f1f1f]" />
+            <span className="text-xs text-gray-600">or</span>
+            <div className="flex-1 h-px bg-[#1f1f1f]" />
+          </div>
+
+          {/* Email / password fallback */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm text-gray-400 mb-1.5">Email</label>
@@ -64,9 +77,10 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-white font-semibold py-2.5 rounded-xl text-sm"
             >
-              {loading ? 'Logging in…' : 'Log in'}
+              {loading ? 'Logging in…' : 'Log in with email'}
             </button>
           </form>
+
           <p className="text-center text-sm text-gray-500 mt-5">
             No account?{' '}
             <Link href="/signup" className="text-violet-400 hover:text-violet-300">
