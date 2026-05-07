@@ -18,6 +18,7 @@ export default function Navigation({ username }: { username: string }) {
   const links = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/checkin', label: 'Check-in' },
+    { href: '/injury', label: 'Injury' },
     { href: '/feed', label: 'Feed' },
   ]
 

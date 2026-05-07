@@ -3,7 +3,8 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Navigation from '@/components/Navigation'
 import ReadinessGauge from '@/components/ReadinessGauge'
-import { CheckIn } from '@/lib/types'
+import OnboardingSurvey from '@/components/OnboardingSurvey'
+import { CheckIn, Profile } from '@/lib/types'
 import { getReadinessColor } from '@/lib/readiness'
 
 export default async function DashboardPage() {
@@ -16,6 +17,8 @@ export default async function DashboardPage() {
     .select('*')
     .eq('id', user.id)
     .single()
+
+  const p = profile as Profile | null
 
   const today = new Date().toISOString().split('T')[0]
   const { data: todayCheckin } = await supabase
@@ -37,13 +40,31 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navigation username={profile?.username ?? 'you'} />
+      <Navigation username={p?.username ?? 'you'} />
+
+      {/* Onboarding survey — shown until user completes it */}
+      {p && !p.onboarded && <OnboardingSurvey userId={user.id} />}
+
       <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-8 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Good morning, {profile?.username ?? 'athlete'} 👋</h1>
-            <p className="text-gray-500 text-sm mt-0.5">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+            <h1 className="text-2xl font-bold">Good morning, {p?.username ?? 'athlete'} 👋</h1>
+            <p className="text-gray-500 text-sm mt-0.5">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              {p?.sports && p.sports.length > 0 && (
+                <span className="ml-2 text-violet-400">
+                  {p.sports.slice(0, 2).map(s => {
+                    const labels: Record<string, string> = {
+                      gym: '🏋️', basketball: '🏀', running: '🏃', soccer: '⚽',
+                      swimming: '🏊', cycling: '🚴', martial_arts: '🥊',
+                      tennis: '🎾', volleyball: '🏐', baseball: '⚾', other: '🏅',
+                    }
+                    return labels[s] ?? ''
+                  }).join(' ')}
+                </span>
+              )}
+            </p>
           </div>
           <Link
             href="/checkin"
@@ -79,7 +100,6 @@ export default async function DashboardPage() {
               </div>
             )}
 
-            {/* Breakdown */}
             <div className="grid grid-cols-3 gap-3 mt-4">
               <div className="bg-[#0a0a0a] rounded-xl p-3 text-center">
                 <div className="text-xs text-gray-500 mb-1">Sleep</div>
@@ -113,6 +133,24 @@ export default async function DashboardPage() {
             </Link>
           </div>
         )}
+
+        {/* Quick links */}
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/injury" className="bg-[#111] border border-[#1f1f1f] hover:border-[#333] transition-colors rounded-2xl p-4 flex items-center gap-3">
+            <span className="text-2xl">🩹</span>
+            <div>
+              <div className="text-sm font-medium">Injury check</div>
+              <div className="text-xs text-gray-500">Assess symptoms</div>
+            </div>
+          </Link>
+          <Link href="/feed" className="bg-[#111] border border-[#1f1f1f] hover:border-[#333] transition-colors rounded-2xl p-4 flex items-center gap-3">
+            <span className="text-2xl">👥</span>
+            <div>
+              <div className="text-sm font-medium">Community</div>
+              <div className="text-xs text-gray-500">See the feed</div>
+            </div>
+          </Link>
+        </div>
 
         {/* History */}
         {historyItems.length > 0 && (
